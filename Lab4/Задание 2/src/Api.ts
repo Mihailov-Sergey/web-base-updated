@@ -81,34 +81,44 @@ export class Api {
 
         let fetchParams: RequestInit = { method };
 
-        if (body) fetchParams.body = JSON.stringify(body);
+        if (body) {
+            fetchParams.body = JSON.stringify(body);
+            fetchParams.headers = {
+                'Content-Type': 'application/json; charset=UTF-8'
+            };
+        }
 
         /**
          * Здесь необходимо дописать логику базового метода для выполнения запросов
          */
+		const response = await fetch(`${this.basePath}${url}`, fetchParams);
+		if (!response.ok) {
+			throw new Error(`Ошибка HTTP: ${response.status}`);
+		}
+		return response.json() as Promise<T>;
     } 
 
     getPosts(): Promise<PostDTO[]> {
-        // Здесь необходимо дописать метод для получения всех постов
+        return this.baseFetch<PostDTO[]>('posts');
     };
 
     getPostByPostId(postId: number): Promise<PostDTO> {
-        // Здесь необходимо дописать метод для получения поста по его id
+        return this.baseFetch<PostDTO>(`posts/${postId}`);
     };
 
     createPost(post: PostDTO): Promise<{id: number}> {
-        // Здесь необходимо дописать метод для создания поста
+        return this.baseFetch<{id: number}>('posts', 'POST', {...post});
     };
 
     getComments(): Promise<CommentDTO[]> {
-        // Здесь необходимо дописать метод для получения всех комментариев
+        return this.baseFetch<CommentDTO[]>('comments');
     };
     
-    getCommentByCommentId(commentId:): Promise<CommentDTO> {
-        // Здесь необходимо дописать метод для получения всех комментариев
+    getCommentByCommentId(commentId: number): Promise<CommentDTO> {
+        return this.baseFetch<CommentDTO>(`comments/${commentId}`);
     };
 
     getUsers(): Promise<UserDTO[]> {
-        // Здесь необходимо дописать метод для получения всех пользователей
+         return this.baseFetch<UserDTO[]>('users');
     };
 };
